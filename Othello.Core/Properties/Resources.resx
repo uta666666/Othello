@@ -121,6 +121,12 @@
   <data name="Black" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Black.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="pose_lose_boy" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pose_lose_boy.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pose_win_boy" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pose_win_boy.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="White" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\White.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>

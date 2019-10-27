@@ -73,9 +73,19 @@ namespace Othello.Core.Properties {
         /// <summary>
         ///   型 System.Byte[] のローカライズされたリソースを検索します。
         /// </summary>
-        internal static byte[] Image1 {
+        internal static byte[] pose_lose_boy {
             get {
-                object obj = ResourceManager.GetObject("Image1", resourceCulture);
+                object obj = ResourceManager.GetObject("pose_lose_boy", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Byte[] のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static byte[] pose_win_boy {
+            get {
+                object obj = ResourceManager.GetObject("pose_win_boy", resourceCulture);
                 return ((byte[])(obj));
             }
         }

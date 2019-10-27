@@ -27,6 +27,22 @@ namespace Othello.Core.Models
         public StoneType SelfStoneType { get; }
 
         /// <summary>
+        /// 自分の石のリソース
+        /// </summary>
+        public string SelfStoneResource {
+            get {
+                if (SelfStoneType == StoneType.White)
+                {
+                    return Cell.WhiteResource;
+                }
+                else
+                {
+                    return Cell.BlackResource;
+                }
+            }
+        }
+
+        /// <summary>
         /// コンピュータか
         /// </summary>
         public bool IsCPU { get; set; }

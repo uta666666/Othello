@@ -5,6 +5,7 @@ using Reactive.Bindings.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Media;
 
 namespace Othello.Core.ViewModels
 {
@@ -16,8 +17,8 @@ namespace Othello.Core.ViewModels
         public MainViewModel()
         {
             _board = new Board();
-            _player1 = new Player(_board, StoneType.White);
-            _player2 = new Player(_board, StoneType.Black);
+            _player1 = new Player(_board, StoneType.Black);
+            _player2 = new Player(_board, StoneType.White);
             _player2.IsCPU = true;
             _currentPlayer = _player1;
 
@@ -37,12 +38,12 @@ namespace Othello.Core.ViewModels
         {
             InitializeCellProperty();
 
-            PlayerImage = new ReactiveProperty<string>(Cell.WhiteResource);
-            WhiteCount = new ReactiveProperty<string>();
-            BlackCount = new ReactiveProperty<string>();
-            IsWhiteWin = new ReactiveProperty<bool>();
-            IsBlackWin = new ReactiveProperty<bool>();
-            IsDispResult = new ReactiveProperty<bool>();
+            PlayerImage = new ReactiveProperty<string>(_player1.SelfStoneResource);
+            IsYouWin = new ReactiveProperty<bool>();
+            IsYouLose = new ReactiveProperty<bool>();
+            IsDispResult = new ReactiveProperty<bool>(true);
+            WhiteCount = new ReactiveProperty<string>("：2");
+            BlackCount = new ReactiveProperty<string>("：2");
         }
 
         /// <summary>
@@ -77,6 +78,8 @@ namespace Othello.Core.ViewModels
             Cell3_6 = _board.Cells[2][5].ObserveProperty(c => c.ImagePath).ToReactiveProperty();
             Cell3_7 = _board.Cells[2][6].ObserveProperty(c => c.ImagePath).ToReactiveProperty();
             Cell3_8 = _board.Cells[2][7].ObserveProperty(c => c.ImagePath).ToReactiveProperty();
+
+            Cell3_4BackGround = _board.Cells[2][3].ObserveProperty(c => c.BackGround).ToReactiveProperty();
 
             Cell4_1 = _board.Cells[3][0].ObserveProperty(c => c.ImagePath).ToReactiveProperty();
             Cell4_2 = _board.Cells[3][1].ObserveProperty(c => c.ImagePath).ToReactiveProperty();
@@ -179,17 +182,41 @@ namespace Othello.Core.ViewModels
                 }
             });
 
-            ResetCommand = new ReactiveCommand();
-            ResetCommand.Subscribe(() =>
+            ResetCommand = new ReactiveCommand<bool>();
+            ResetCommand.Subscribe(async (isWhite) =>
             {
                 _board.Clear();
                 _currentPlayer = _player1;
 
-                WhiteCount.Value = string.Empty;
-                BlackCount.Value = string.Empty;
-                IsWhiteWin.Value = false;
-                IsBlackWin.Value = false;
-                IsDispResult.Value = false;
+                PlayerImage.Value = _currentPlayer.SelfStoneResource;
+                IsYouWin.Value = false;
+                IsYouLose.Value = false;
+                //IsDispResult.Value = false;
+                WhiteCount.Value = $"：2";
+                BlackCount.Value = $"：2";
+
+                var selectStoneType = isWhite ? StoneType.White : StoneType.Black;
+                _player1.IsCPU = _player1.SelfStoneType != selectStoneType;
+                _player2.IsCPU = _player2.SelfStoneType != selectStoneType;
+
+                if (_currentPlayer.IsCPU)
+                {
+                    await _currentPlayer.SetStoneAutoAsync().ConfigureAwait(true);
+                    if (CheckGameResult())
+                    {
+                        return;
+                    }
+                }
+            });
+
+            HelpCommand = new ReactiveCommand();
+            HelpCommand.Subscribe(() =>
+            {
+                var selectableCells = _board.GetSelectableCells(GetPlayerStoneType());
+                foreach (var cell in selectableCells)
+                {
+                    cell.BackGround = Brushes.LightGreen;
+                }
             });
         }
 
@@ -218,15 +245,20 @@ namespace Othello.Core.ViewModels
             int blackCount;
 
             var result = _board.GetGameResult(out whiteCount, out blackCount);
+
+            WhiteCount.Value = $"：{whiteCount}";
+            BlackCount.Value = $"：{blackCount}";
+            
             if (result != GameResult.None)
             {
-                WhiteCount.Value = $"：{whiteCount}";
-                BlackCount.Value = $"：{blackCount}";
-                IsWhiteWin.Value = result == GameResult.WinWhite;
-                IsBlackWin.Value = result == GameResult.WinBlack;
-                IsDispResult.Value = true;
+                IsYouWin.Value = GetIsYouWin(result) ?? false;
+                IsYouLose.Value = !(GetIsYouWin(result) ?? false);
+                //IsDispResult.Value = true;
+                //WhiteCount.Value = $"：{whiteCount}";
+                //BlackCount.Value = $"：{blackCount}";
                 return true;
             }
+
             ChangePlayer();
             return false;
         }
@@ -246,6 +278,37 @@ namespace Othello.Core.ViewModels
             {
                 PlayerImage.Value = Cell.BlackResource;
             }
+        }
+
+        private bool? GetIsYouWin(GameResult result)
+        {
+            switch (result)
+            {
+                case GameResult.WinWhite:
+                    return GetPlayerStoneType() == StoneType.White;
+                case GameResult.WinBlack:
+                    return GetPlayerStoneType() == StoneType.Black;
+                case GameResult.Draw:
+                    return null;
+                case GameResult.None:
+                default:
+                    const string message = "決着がついていません。";
+                    throw new ArgumentException(message, nameof(result));
+            }
+        }
+
+        private StoneType GetPlayerStoneType()
+        {
+            if (!_player1.IsCPU)
+            {
+                return _player1.SelfStoneType;
+            }
+            if (!_player2.IsCPU)
+            {
+                return _player2.SelfStoneType;
+            }
+
+            throw new InvalidOperationException();
         }
 
 
@@ -280,6 +343,9 @@ namespace Othello.Core.ViewModels
         public ReactiveProperty<string> Cell3_6 { get; set; }
         public ReactiveProperty<string> Cell3_7 { get; set; }
         public ReactiveProperty<string> Cell3_8 { get; set; }
+
+
+        public ReactiveProperty<Brush> Cell3_4BackGround { get; set; }
         #endregion Row3
         #region Row4
         public ReactiveProperty<string> Cell4_1 { get; set; }
@@ -341,9 +407,9 @@ namespace Othello.Core.ViewModels
 
         public ReactiveProperty<string> BlackCount { get; set; }
 
-        public ReactiveProperty<bool> IsWhiteWin { get; set; }
+        public ReactiveProperty<bool> IsYouWin { get; set; }
 
-        public ReactiveProperty<bool> IsBlackWin { get; set; }
+        public ReactiveProperty<bool> IsYouLose { get; set; }
 
         public ReactiveProperty<bool> IsDispResult { get; set; }
 
@@ -360,8 +426,13 @@ namespace Othello.Core.ViewModels
         public ReactiveCommand PassCommand { get; private set; }
 
         /// <summary>
+        /// リセット
+        /// </summary>
+        public ReactiveCommand<bool> ResetCommand { get; private set; }
+
+        /// <summary>
         /// 
         /// </summary>
-        public ReactiveCommand ResetCommand { get; private set; }
+        public ReactiveCommand HelpCommand { get; private set; }
     }
 }

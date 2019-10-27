@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <None Remove="Resources\Black.png" />
+    <None Remove="Resources\pose_lose_boy.png" />
+    <None Remove="Resources\pose_win_boy.png" />
     <None Remove="Resources\White.png" />
   </ItemGroup>
 
@@ -25,6 +27,8 @@
 
   <ItemGroup>
     <Resource Include="Resources\Black.png" />
+    <Resource Include="Resources\pose_lose_boy.png" />
+    <Resource Include="Resources\pose_win_boy.png" />
     <Resource Include="Resources\White.png" />
   </ItemGroup>
 

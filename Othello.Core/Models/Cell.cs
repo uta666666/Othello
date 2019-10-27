@@ -1,7 +1,10 @@
 ﻿using Othello.Core.Commons;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
+using System.Windows.Media;
+using Color = System.Windows.Media.Color;
 
 namespace Othello.Core.Models
 {
@@ -76,6 +79,23 @@ namespace Othello.Core.Models
         /// セルの座標
         /// </summary>
         public CellPosition Position { get; private set; }
+
+        private Brush _backGround = Brushes.LawnGreen;
+        /// <summary>
+        /// 
+        /// </summary>
+        public Brush BackGround {
+            get {
+                return _backGround;
+            }
+            set {
+                if (_backGround == value)
+                {
+                    return;
+                }
+                SetProperty(ref _backGround, value);
+            }
+        }
 
         /// <summary>
         /// 石を返す

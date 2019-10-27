@@ -25,16 +25,16 @@ namespace Othello.Core.Models
         /// <returns></returns>
         public GameResult GetGameResult(out int whiteCount, out int blackCount)
         {
-            whiteCount = 0;
-            blackCount = 0;
+            //whiteCount = 0;
+            //blackCount = 0;
+
+            whiteCount = GetCellsWithStone(StoneType.White).Count();
+            blackCount = GetCellsWithStone(StoneType.Black).Count();
 
             if (GetSelectableCells(StoneType.White).Any() || GetSelectableCells(StoneType.Black).Any())
             {
                 return GameResult.None;
             }
-
-            whiteCount = GetCellsWithStone(StoneType.White).Count();
-            blackCount = GetCellsWithStone(StoneType.Black).Count();
 
             if (whiteCount > blackCount)
             {

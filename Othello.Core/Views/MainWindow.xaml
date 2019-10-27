@@ -7,6 +7,7 @@
     xmlns:local="clr-namespace:Othello.Core"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:s="clr-namespace:System;assembly=mscorlib"
     xmlns:vm="clr-namespace:Othello.Core.ViewModels"
     Title="Othello"
     Width="800"
@@ -22,6 +23,8 @@
 
     <Controls:MetroWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BoolVisibilityConverter" />
+        <s:Boolean x:Key="true">True</s:Boolean>
+        <s:Boolean x:Key="false">False</s:Boolean>
     </Controls:MetroWindow.Resources>
 
     <Controls:MetroWindow.LeftWindowCommands>
@@ -29,6 +32,7 @@
             <Button
                 Margin="10,0,10,0"
                 Command="{Binding ResetCommand}"
+                CommandParameter="{Binding IsChecked, ElementName=radioButtonWhite}"
                 Content="リセット" />
         </Controls:WindowCommands>
     </Controls:MetroWindow.LeftWindowCommands>
@@ -88,17 +92,54 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Orientation="Vertical">
-                <TextBlock
+                <!--<TextBlock
                     FontSize="12"
                     Style="{DynamicResource MaterialDesignTitleTextBlock}"
-                    Text="あなたはどっち？" />
-                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
+                    Text="あなたはどっち？" />-->
+
+                <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
                     <RadioButton
+                        x:Name="radioButtonBlack"
                         Grid.Column="0"
                         Margin="0,0,0,0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         VerticalContentAlignment="Center"
+                        Command="{Binding ResetCommand}"
+                        CommandParameter="{StaticResource false}"
+                        FontSize="30"
+                        FontWeight="ExtraBold"
+                        Foreground="White"
+                        GroupName="Stone"
+                        IsChecked="True"
+                        Style="{StaticResource MaterialDesignRadioButton}">
+                        <Image
+                            Width="30"
+                            Height="30"
+                            Margin="5,0,0,0"
+                            Source="../Resources/Black.png" />
+                    </RadioButton>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="10,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        FontSize="30"
+                        Text="{Binding BlackCount.Value}"
+                        Visibility="{Binding IsDispResult.Value, Converter={StaticResource BoolVisibilityConverter}}" />
+                </StackPanel>
+
+                <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
+                    <RadioButton
+                        x:Name="radioButtonWhite"
+                        Grid.Column="0"
+                        Margin="0,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Command="{Binding ResetCommand}"
+                        CommandParameter="{StaticResource true}"
                         FontSize="30"
                         FontWeight="ExtraBold"
                         Foreground="White"
@@ -120,40 +161,57 @@
                         Text="{Binding WhiteCount.Value}"
                         Visibility="{Binding IsDispResult.Value, Converter={StaticResource BoolVisibilityConverter}}" />
                 </StackPanel>
-
-                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
-                    <RadioButton
-                        Grid.Column="0"
-                        Margin="0,0,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        VerticalContentAlignment="Center"
-                        FontSize="30"
-                        FontWeight="ExtraBold"
-                        Foreground="White"
-                        GroupName="Stone"
-                        Style="{StaticResource MaterialDesignRadioButton}">
-                        <Image
-                            Width="30"
-                            Height="30"
-                            Margin="5,0,0,0"
-                            Source="../Resources/Black.png" />
-                    </RadioButton>
-
-                    <TextBlock
-                        Grid.Column="0"
-                        Margin="10,0,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        FontSize="30"
-                        Text="{Binding BlackCount.Value}"
-                        Visibility="{Binding IsDispResult.Value, Converter={StaticResource BoolVisibilityConverter}}" />
-                </StackPanel>
                 <StackPanel.RenderTransform>
                     <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
                 </StackPanel.RenderTransform>
             </StackPanel>
+
+            <!--<Button Grid.Column="2" Command="{Binding HelpCommand}" />-->
         </Grid>
+
+        <!--  勝利画像  -->
+        <Button
+            Grid.Row="1"
+            Width="400"
+            Height="400"
+            Panel.ZIndex="99"
+            Command="{Binding ResetCommand}"
+            CommandParameter="{Binding IsChecked, ElementName=radioButtonWhite}"
+            Cursor="Hand"
+            Style="{StaticResource MaterialDesignToolButton}"
+            Visibility="{Binding IsYouWin.Value, Converter={StaticResource BoolVisibilityConverter}}">
+            <Image Width="400" Source="../Resources/pose_win_boy.png">
+                <Image.Effect>
+                    <DropShadowEffect
+                        BlurRadius="30"
+                        Direction="315"
+                        ShadowDepth="10"
+                        Color="MidnightBlue" />
+                </Image.Effect>
+            </Image>
+        </Button>
+
+        <!--  負け画像  -->
+        <Button
+            Grid.Row="1"
+            Width="400"
+            Height="400"
+            Panel.ZIndex="99"
+            Command="{Binding ResetCommand}"
+            CommandParameter="{Binding IsChecked, ElementName=radioButtonWhite}"
+            Cursor="Hand"
+            Style="{StaticResource MaterialDesignToolButton}"
+            Visibility="{Binding IsYouLose.Value, Converter={StaticResource BoolVisibilityConverter}}">
+            <Image Width="400" Source="../Resources/pose_lose_boy.png">
+                <Image.Effect>
+                    <DropShadowEffect
+                        BlurRadius="30"
+                        Direction="315"
+                        ShadowDepth="10"
+                        Color="MidnightBlue" />
+                </Image.Effect>
+            </Image>
+        </Button>
 
         <Grid Grid.Row="1" Margin="2">
             <Grid.RowDefinitions>
@@ -510,6 +568,7 @@
                 Padding="0"
                 Command="{Binding CellClickCommand}"
                 CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}"
+                Cursor="Hand"
                 Style="{StaticResource MaterialDesignRaisedButton}"
                 Tag="2:3">
                 <Image
@@ -921,6 +980,7 @@
                 Padding="0"
                 Command="{Binding CellClickCommand}"
                 CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}"
+                Cursor="Hand"
                 Style="{StaticResource MaterialDesignRaisedButton}"
                 Tag="5:3">
                 <Image
